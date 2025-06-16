@@ -47,7 +47,7 @@ export default function Home() {
     setLoading(true);
     setError(null);
     try {
-      const forecastRes = await fetch("http://localhost:8080/api/weather/forecast", {
+      const forecastRes = await fetch("https://solar-weather.onrender.com/api/weather/forecast", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ latitude: lat, longitude: lon }),
@@ -55,7 +55,7 @@ export default function Home() {
       if (!forecastRes.ok) throw new Error(`Forecast API error: ${forecastRes.status}`);
       const forecastData = await forecastRes.json();
 
-      const summaryRes = await fetch("http://localhost:8080/api/weather/weekly-summary", {
+      const summaryRes = await fetch("https://solar-weather.onrender.com/api/weather/weekly-summary", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ latitude: lat, longitude: lon }),
