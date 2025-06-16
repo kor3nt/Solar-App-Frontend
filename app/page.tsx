@@ -1,103 +1,122 @@
-import Image from "next/image";
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { useGeolocation } from "./hooks/useGeolocation";
+import { WeatherTable } from "./components/WeatherTable";
+import { FooterSummary } from "./components/FooterSummary";
+import { LocationForm } from "./components/LocationForm";
+import { DailyForecast, WeeklySummary } from "./types";
+import ThemeToggle from "./components/ThemeToggle";
+import dynamic from "next/dynamic";
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faLocationArrow } from '@fortawesome/free-solid-svg-icons';
+
+// Kraków
+const DEFAULT_COORDS = { lat: 50.0647, lon: 19.9450 };
+
+const LocationPicker = dynamic(() => import("./components/LocationPicker"), {
+  ssr: false,
+  loading: () => <p>Ładowanie mapy...</p>,
+});
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [{ latitude, longitude, error: geoError }, refreshLocation] = useGeolocation();
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+  const [coords, setCoords] = useState<{ lat: number; lon: number } | null>(null);
+  const [isLocationSet, setIsLocationSet] = useState(false);
+
+  useEffect(() => {
+    if (!isLocationSet) {
+      if (latitude !== null && longitude !== null) {
+        setCoords({ lat: latitude, lon: longitude });
+        setIsLocationSet(true);
+      } else if (geoError) {
+        setCoords(DEFAULT_COORDS);
+        setIsLocationSet(true);
+      }
+    }
+  }, [latitude, longitude, geoError, isLocationSet]);
+
+  const [dailyForecasts, setDailyForecasts] = useState<DailyForecast[] | null>(null);
+  const [weeklySummary, setWeeklySummary] = useState<WeeklySummary | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = async (lat: number, lon: number) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const forecastRes = await fetch("http://localhost:8080/api/weather/forecast", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ latitude: lat, longitude: lon }),
+      });
+      if (!forecastRes.ok) throw new Error(`Forecast API error: ${forecastRes.status}`);
+      const forecastData = await forecastRes.json();
+
+      const summaryRes = await fetch("http://localhost:8080/api/weather/weekly-summary", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ latitude: lat, longitude: lon }),
+      });
+      if (!summaryRes.ok) throw new Error(`Weekly summary API error: ${summaryRes.status}`);
+      const summaryData = await summaryRes.json();
+
+      setDailyForecasts(forecastData);
+      setWeeklySummary(summaryData);
+    } catch (e) {
+      if (e instanceof Error) setError(e.message);
+      else setError("Nieznany błąd");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (coords) {
+      fetchData(coords.lat, coords.lon);
+    }
+  }, [coords]);
+
+  const handleRestoreLocation = () => {
+    refreshLocation();
+    setIsLocationSet(false); 
+  };
+
+  return (
+    <main className="bg-white dark:bg-gray-900 text-black dark:text-white p-4 rounded min-h-screen">
+      <div className="fixed bottom-4 right-4">
+        <ThemeToggle />
+      </div>
+
+      <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center mb-4">
+        Prognoza pogody na 7 dni
+      </h1>
+      <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold text-center mb-6">
+        Lokalizacja:{" "}
+        {coords
+          ? `${coords.lat.toFixed(4)}, ${coords.lon.toFixed(4)}`
+          : "Brak danych o lokalizacji"}
+      </h2>
+
+      <LocationForm onSubmit={(lat, lon) => setCoords({ lat, lon })} />
+      <button onClick={handleRestoreLocation} className="relative px-6 py-3 font-bold dark:text-white text-black bg-blue-500 dark:bg-blue-300 dark:hover:bg-blue-400 rounded-lg shadow-md transition-all duration-300 ease-in-out hover:bg-blue-600 hover:shadow-lg hover:scale-105 active:bg-blue-700 active:scale-95"><FontAwesomeIcon icon={faLocationArrow} /></button>
+
+      {coords && (
+        <LocationPicker
+          defaultCoords={coords}
+          onLocationSelect={(lat, lon) => setCoords({ lat, lon })}
+        />
+      )}
+
+      {loading && <p className="text-center my-4">Ładowanie danych pogodowych...</p>}
+
+      {error && <p className="text-center text-red-600 my-4">Błąd: {error}</p>}
+
+      {dailyForecasts && <WeatherTable dailyForecasts={dailyForecasts} />}
+
+      {weeklySummary && <FooterSummary summary={weeklySummary} />}
+    </main>
   );
 }
