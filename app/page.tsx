@@ -9,9 +9,6 @@ import { DailyForecast, WeeklySummary } from "./types";
 import ThemeToggle from "./components/ThemeToggle";
 import dynamic from "next/dynamic";
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLocationArrow } from '@fortawesome/free-solid-svg-icons';
-
 // Kraków
 const DEFAULT_COORDS = { lat: 50.0647, lon: 19.9450 };
 
