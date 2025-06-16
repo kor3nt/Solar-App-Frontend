@@ -99,17 +99,27 @@ export default function Home() {
           ? `${coords.lat.toFixed(4)}, ${coords.lon.toFixed(4)}`
           : "Brak danych o lokalizacji"}
       </h2>
+      
+      <div className="flex flex-col md:flex-row gap-6">
+        <div className="w-full md:w-1/2 flex justify-center items-center">
+          <LocationForm
+            onSubmit={(lat, lon) => setCoords({ lat, lon })}
+            onRestoreLocation={handleRestoreLocation}
+            initialLat={coords?.lat ?? null}
+            initialLon={coords?.lon ?? null}
+          />
+        </div>
 
-      <LocationForm onSubmit={(lat, lon) => setCoords({ lat, lon })} />
-      <button onClick={handleRestoreLocation} className="relative px-6 py-3 font-bold dark:text-white text-black bg-blue-500 dark:bg-blue-300 dark:hover:bg-blue-400 rounded-lg shadow-md transition-all duration-300 ease-in-out hover:bg-blue-600 hover:shadow-lg hover:scale-105 active:bg-blue-700 active:scale-95"><FontAwesomeIcon icon={faLocationArrow} /></button>
-
-      {coords && (
-        <LocationPicker
-          defaultCoords={coords}
-          onLocationSelect={(lat, lon) => setCoords({ lat, lon })}
-        />
-      )}
-
+        <div className="w-full md:w-1/2">
+          {coords && (
+            <LocationPicker
+              defaultCoords={coords}
+              onLocationSelect={(lat, lon) => setCoords({ lat, lon })}
+            />
+          )}
+        </div>
+      </div>
+      
       {loading && <p className="text-center my-4">Ładowanie danych pogodowych...</p>}
 
       {error && <p className="text-center text-red-600 my-4">Błąd: {error}</p>}
