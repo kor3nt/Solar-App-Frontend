@@ -1,5 +1,6 @@
 # Zadanie rekrutacyjne
 Zadaniem jest stworzenie aplikacji do wyświetlania prognozy pogody na najbliższe 7 dni korzystając z zewnętrznego API. Dodatkowo aplikacja powinna oszacować prognozowaną produkcję energii z instalacji fotowoltaicznej.
+Backend: [github.com/kor3nt/Solar-App-Backend](https://github.com/kor3nt/Solar-App-Backend)
 
 ## Frontend
 Celem będzie stworzenie tabeli z prognozą pogody na kolejne 7 dni oraz stopki z informacjami ogólnymi dla całego tygodnia. Wykorzystasz do tego wcześniej przygotowane endpoiny API, do których przekażesz szerokość i wysokość geograficzną. Szerokość i wysokość geograficzna powinna zostać automatycznie pobrana na podstawie aktualnej lokalizacji.
