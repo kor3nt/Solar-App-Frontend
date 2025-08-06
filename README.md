@@ -1,36 +1,21 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Zadanie rekrutacyjne
+Zadaniem jest stworzenie aplikacji do wyświetlania prognozy pogody na najbliższe 7 dni korzystając z zewnętrznego API. Dodatkowo aplikacja powinna oszacować prognozowaną produkcję energii z instalacji fotowoltaicznej.
 
-## Getting Started
+## Frontend
+Celem będzie stworzenie tabeli z prognozą pogody na kolejne 7 dni oraz stopki z informacjami ogólnymi dla całego tygodnia. Wykorzystasz do tego wcześniej przygotowane endpoiny API, do których przekażesz szerokość i wysokość geograficzną. Szerokość i wysokość geograficzna powinna zostać automatycznie pobrana na podstawie aktualnej lokalizacji.
+Tabela, którą stworzysz, powinna posiadać osobną kolumnę dla każdego z siedmiu dni. Ważne jest, aby była ona czytelna.
+### W każdej kolumnie powinny znaleźć się następujące informacje:
+*	Data w formacie DD/MM/YYYY. Reprezentuje ona konkretny dzień, dla którego generowana jest prognoza.
+*	Ikona pogody, która ilustruje przewidywane warunki atmosferyczne. Informacje na temat kodów pogodowych można znaleźć w zewnętrznym API, a następnie przypisać odpowiedni kod do odpowiadającej mu ikony. Najłatwiej będzie skorzystać z gotowego pakietu ikon dostępnego na stronie: https://fontawesome.com/search
+*	Temperatura maksymalna i minimalna w danym dniu
+*	Szacowana wartość wygenerowanej energii w kWh, co jest szczególnie cenne dla osób, które korzystają z energii słonecznej.
+### Na stopce powinny znaleźć się:
+*	Skrajne temperatury jakie pojawią się w ciągu tygodnia
+*	Średnie ciśnienie w ciągu najbliższego tygodnia
+*	Średni czas ekspozycji na słońce w ciągu najbliższego tygodnia
+*	Komentarz podsumowujący prognozę
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Nice to Have
+* Responsywność
+* Dark mode
+* Mapa świata z możliwością wyboru lokalizacji (Leaflet — an open-source JavaScript library for interactive maps)
